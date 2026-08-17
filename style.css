@@ -1,0 +1,303 @@
+/* ==========================================================================
+   Sajal Portfolio - Pure Flat Digital Preloader to Coming Soon
+   ========================================================================== */
+
+:root {
+    --bg-primary: #000000;
+    --text-primary: #ffffff;
+    --text-secondary: #888888;
+    --text-muted: #444444;
+    --text-dim: #222222;
+    
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-highlight: rgba(255, 255, 255, 0.25);
+    
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    --font-digital: 'Share Tech Mono', 'JetBrains Mono', monospace;
+    
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reset & Setup */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    line-height: 1.6;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Ambient Canvas */
+.ambient-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.25;
+}
+
+/* Top Controls */
+.top-controls {
+    position: fixed;
+    top: 1.5rem;
+    right: 2rem;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.control-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    padding: 0.45rem 0.85rem;
+    border-radius: 4px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s var(--ease-out-expo);
+}
+
+.control-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--border-highlight);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.control-btn.active {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.control-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-5px);
+}
+
+/* Main Preloader Layout */
+.preloader-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+/* Scanlines & Depth */
+.scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0),
+        rgba(255,255,255,0) 50%,
+        rgba(0, 0, 0, 0.3) 50%,
+        rgba(0, 0, 0, 0.3)
+    );
+    background-size: 100% 4px;
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+.radial-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 50%, rgba(0, 0, 0, 0.95) 100%);
+    pointer-events: none;
+}
+
+.preloader-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 90%;
+    max-width: 860px;
+    padding: 2rem 0;
+}
+
+/* Role Badge */
+.role-badge-container {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--text-secondary);
+    margin-bottom: 2.25rem;
+    text-transform: uppercase;
+}
+
+.role-badge-container .bracket {
+    color: var(--text-muted);
+}
+
+.badge-text {
+    transition: color 0.3s ease;
+}
+
+/* Digital Text Display Box */
+.display-box {
+    margin-bottom: 3.5rem;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.scramble-wrapper {
+    position: relative;
+    padding: 0.5rem 1rem;
+}
+
+.digital-text {
+    font-family: var(--font-digital);
+    font-size: clamp(2.5rem, 6.5vw, 5.2rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    text-shadow: none; /* Removed all glow */
+    white-space: nowrap;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.digital-text.is-final {
+    letter-spacing: 0.04em;
+    text-shadow: none; /* No glow on final state */
+}
+
+.digital-text.glitch-flash {
+    animation: textGlitch 0.2s ease;
+}
+
+@keyframes textGlitch {
+    0% {
+        transform: translate(0);
+    }
+    20% {
+        transform: translate(-2px, 1px);
+    }
+    40% {
+        transform: translate(2px, -1px);
+    }
+    60% {
+        transform: translate(-1px, 1px);
+    }
+    80% {
+        transform: translate(1px, -1px);
+    }
+    100% {
+        transform: translate(0);
+    }
+}
+
+.role-desc {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    margin-top: 1rem;
+    text-transform: uppercase;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Progress Section */
+.progress-section {
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+}
+
+.progress-val {
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.progress-bar-track {
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar-fill {
+    width: 0%;
+    height: 100%;
+    background: #ffffff;
+    box-shadow: none; /* Removed glow */
+    transition: width 0.1s linear;
+}
+
+.telemetry-bar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-top: 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .top-controls {
+        top: 1rem;
+        right: 1.25rem;
+    }
+    
+    .display-box {
+        margin-bottom: 2rem;
+    }
+    
+    .digital-text {
+        font-size: 2.2rem;
+    }
+}
