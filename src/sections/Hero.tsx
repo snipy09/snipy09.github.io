@@ -1,91 +1,67 @@
-import { useEffect, useRef, useState } from "react"
-import { gsap } from "gsap"
+import { Suspense, lazy } from "react"
+import { ArrowDown, MapPin } from "lucide-react"
 import { PROFILE } from "@/lib/data"
-import { scrollTo } from "@/lib/scroll"
+import type { Theme } from "@/hooks/useTheme"
 
-function Chars({ text }: { text: string }) {
-  return (
-    <span className="line" aria-label={text}>
-      {text.split("").map((c, i) => (
-        <span className="char-mask" key={i} aria-hidden>
-          <span className="char">{c}</span>
-        </span>
-      ))}
-    </span>
-  )
+const GridField = lazy(() => import("@/components/GridField"))
+
+function hasWebGL() {
+  try {
+    const c = document.createElement("canvas")
+    return !!(c.getContext("webgl2") || c.getContext("webgl"))
+  } catch {
+    return false
+  }
 }
+const WEBGL = typeof document !== "undefined" && hasWebGL()
 
-export default function Hero({ ready }: { ready: boolean }) {
-  const root = useRef<HTMLElement>(null)
-  const [role, setRole] = useState(0)
-
-  useEffect(() => {
-    if (!ready) return
-    const id = setInterval(() => setRole((r) => (r + 1) % PROFILE.roles.length), 2200)
-    return () => clearInterval(id)
-  }, [ready])
-
-  useEffect(() => {
-    if (!ready) return
-    const ctx = gsap.context(() => {
-      gsap
-        .timeline({ defaults: { ease: "expo.out" } })
-        .fromTo(".hero .char", { y: 0, yPercent: 110, rotate: 8 }, { yPercent: 0, rotate: 0, duration: 1.6, stagger: 0.045 })
-        .to(".hero .fade-up", { y: 0, opacity: 1, duration: 1.2, stagger: 0.08 }, "-=1.2")
-        .to(".hero-rule", { scaleX: 1, duration: 1.4 }, "-=1.2")
-
-      // Title drifts apart on scroll (parallax).
-      gsap.to(".hero-title .line:first-child", {
-        xPercent: -12,
-        ease: "none",
-        scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: true },
-      })
-      gsap.to(".hero-title .line:last-child", {
-        xPercent: 12,
-        ease: "none",
-        scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: true },
-      })
-      gsap.to(".hero-inner", {
-        opacity: 0.2,
-        ease: "none",
-        scrollTrigger: { trigger: root.current, start: "40% top", end: "bottom top", scrub: true },
-      })
-    }, root)
-    return () => ctx.revert()
-  }, [ready])
-
+export default function Hero({ theme }: { theme: Theme }) {
   return (
-    <section ref={root} className="hero" id="top">
-      <div className="hero-inner">
-        <div className="hero-top">
-          <p className="mono fade-up">( Portfolio — 2026 )</p>
-          <p className="mono fade-up hero-loc">Based in {PROFILE.location} · Working worldwide</p>
+    <section className="hero" id="top">
+      <div className="container hero-grid">
+        <div className="hero-copy">
+          <p className="hero-meta intro" style={{ ["--d" as string]: "0ms" }}>
+            <MapPin size={14} strokeWidth={1.75} aria-hidden />
+            {PROFILE.location} · open to freelance and full-time work
+          </p>
+          <h1 className="hero-title intro" style={{ ["--d" as string]: "60ms" }}>
+            I build trading tools, automation and web products.
+          </h1>
+          <p className="hero-lede intro" style={{ ["--d" as string]: "120ms" }}>
+            I'm Sajal, a software engineer who works across the stack, from quantitative models and data pipelines to
+            the interfaces people use every day. I usually take a project from first sketch to deployment.
+          </p>
+          <div className="hero-actions intro" style={{ ["--d" as string]: "180ms" }}>
+            <a href="#work" className="btn btn-primary">
+              See my work <ArrowDown size={16} strokeWidth={1.75} aria-hidden />
+            </a>
+            <a href="#contact" className="btn btn-ghost">
+              Contact me
+            </a>
+          </div>
+          <dl className="hero-facts intro" style={{ ["--d" as string]: "240ms" }}>
+            <div>
+              <dt>Focus</dt>
+              <dd>Quant, product, automation</dd>
+            </div>
+            <div>
+              <dt>Shipped</dt>
+              <dd>15+ live projects</dd>
+            </div>
+            <div>
+              <dt>Stack</dt>
+              <dd>Python, TypeScript, React</dd>
+            </div>
+          </dl>
         </div>
-
-        <h1 className="hero-title">
-          <Chars text={PROFILE.first} />
-          <Chars text={PROFILE.last} />
-        </h1>
-
-        <div className="hero-rule" />
-
-        <div className="hero-bottom">
-          <p className="hero-role fade-up">
-            <span className="muted">Jack of all trades —</span>
-            <span className="role-slot">
-              <span className="role-word" key={role}>
-                {PROFILE.roles[role]}
-              </span>
-            </span>
-          </p>
-          <p className="hero-lede fade-up">
-            Engineer across AI, quant, full-stack, automation and design. One builder, end to end — from the model to
-            the pixel.
-          </p>
-          <button className="scroll-cue fade-up" onClick={() => scrollTo("#about")} data-cursor="Scroll">
-            <span className="mono">Scroll</span>
-            <span className="scroll-line" />
-          </button>
+        <div className="hero-visual intro" style={{ ["--d" as string]: "200ms" }}>
+          {WEBGL ? (
+            <Suspense fallback={<div className="grid-field" />}>
+              <GridField theme={theme} />
+            </Suspense>
+          ) : (
+            <div className="grid-field grid-fallback" />
+          )}
         </div>
       </div>
     </section>

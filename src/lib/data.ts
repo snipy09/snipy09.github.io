@@ -1,222 +1,192 @@
 export const PROFILE = {
   name: "Sajal Mishra",
-  first: "Sajal",
-  last: "Mishra",
+  role: "Software engineer",
+  location: "India",
+  timezone: "Asia/Kolkata",
   email: "sajalmishra0906@gmail.com",
   github: "https://github.com/snipy09",
   linkedin: "https://linkedin.com/in/sajalmishra",
-  location: "India",
-  timezone: "Asia/Kolkata",
-  roles: [
-    "AI engineer.",
-    "quant developer.",
-    "full-stack builder.",
-    "automation engineer.",
-    "product designer.",
-    "founder.",
-  ],
-  statement:
-    "I don't pick a lane. I build quant engines, AI agents, automation pipelines and the interfaces that sit on top of them — then ship every one of them to production.",
-  stats: [
-    { value: "06", label: "Disciplines" },
-    { value: "16", label: "Public repositories" },
-    { value: "15+", label: "Live deployments" },
-    { value: "01", label: "Person doing all of it" },
-  ],
 }
 
-export interface Discipline {
-  index: string
-  title: string
-  kicker: string
-  body: string
-  tags: string[]
-  work: string[]
-}
-
-export const DISCIPLINES: Discipline[] = [
-  {
-    index: "01",
-    title: "AI Engineering",
-    kicker: "Agents & LLM systems",
-    body: "Multi-provider LLM pipelines, autonomous agents and AI features wired into real products — with guardrails, quotas and structured outputs.",
-    tags: ["Claude", "OpenAI", "Gemini", "LangChain", "CrewAI", "RAG"],
-    work: ["Nomadic", "Instagram AI AutoPilot", "Ads Intelligence"],
-  },
-  {
-    index: "02",
-    title: "Quant & Finance",
-    kicker: "Models that price risk",
-    body: "Regime detection with rolling SVD and Gaussian HMMs, Monte Carlo portfolio optimisation, and market-data validation built for traders.",
-    tags: ["NumPy", "SciPy", "HMM", "Ledoit-Wolf", "Isolation Forest", "Plotly"],
-    work: ["RegimeGuard", "QuantumPort", "MarketGuard", "Kubair"],
-  },
-  {
-    index: "03",
-    title: "Full-stack Product",
-    kicker: "From schema to pixel",
-    body: "Next.js and React front ends on top of typed APIs and Postgres — CRMs, dashboards and SaaS platforms that teams use daily.",
-    tags: ["Next.js", "React", "TypeScript", "FastAPI", "Postgres", "Supabase"],
-    work: ["DCuboid CRM", "PulseFlow", "Kubair"],
-  },
-  {
-    index: "04",
-    title: "Automation",
-    kicker: "Work that runs itself",
-    body: "Scrapers, bots and event-driven pipelines that remove repetitive work: lead extraction, job aggregation, marketing and outreach.",
-    tags: ["Python", "Playwright", "Node.js", "Telegram API", "Docker", "Cron"],
-    work: ["Lead Extractor Pro", "Telegram Job Bot", "FlashJob Bot"],
-  },
-  {
-    index: "05",
-    title: "Design & Web",
-    kicker: "Interfaces with taste",
-    body: "Monotone, motion-first web design. Landing pages and client sites with 3D, shaders and micro-interactions that feel considered.",
-    tags: ["Tailwind", "GSAP", "Three.js", "Framer Motion", "Shaders", "Figma"],
-    work: ["Storonix", "Clinic websites", "This site"],
-  },
-  {
-    index: "06",
-    title: "Founder",
-    kicker: "Zero to shipped",
-    body: "I take ideas from a blank repo to a live product — scoping, building, deploying and iterating with real users.",
-    tags: ["Product", "Strategy", "GTM", "Vercel", "Analytics"],
-    work: ["Nomadic", "DCuboid", "Kubair"],
-  },
-]
+export type Category = "Quant" | "Product" | "Automation" | "Web"
 
 export interface Project {
+  slug: string
   name: string
-  tagline: string
-  category: string
+  summary: string
+  category: Category
   year: string
   stack: string[]
   live?: string
   repo?: string
-  hue: number
+  /** Featured projects get a write-up and an illustration. */
+  details?: string[]
+  visual?: "regime" | "frontier" | "candles"
 }
 
 export const PROJECTS: Project[] = [
   {
-    name: "Nomadic",
-    tagline: "A universal career OS — AI-assisted planning for where your career goes next.",
-    category: "AI · Product",
-    year: "2026",
-    stack: ["TypeScript", "Next.js", "LLMs"],
-    live: "https://nomadicai.vercel.app",
-    hue: 205,
-  },
-  {
+    slug: "regimeguard",
     name: "RegimeGuard",
-    tagline: "Early-warning system for market regime shifts using rolling SVD subspace drift and a 3-state Gaussian HMM.",
+    summary: "An early-warning system for shifts in market regime.",
     category: "Quant",
     year: "2026",
-    stack: ["Python", "HMM", "SVD"],
+    stack: ["Python", "NumPy", "Gaussian HMM", "Plotly"],
     live: "https://regime-early-warning.vercel.app",
     repo: "https://github.com/snipy09/RSEW",
-    hue: 260,
+    visual: "regime",
+    details: [
+      "Rolling 60-day SVD tracks how the market's latent factor structure drifts over time.",
+      "Three instability measures (singular value change, subspace drift, variance concentration) feed a 3-state Gaussian HMM.",
+      "Includes a backtest that moves to cash on risk-off signals, plus a live dashboard.",
+    ],
   },
   {
+    slug: "quantumport",
     name: "QuantumPort",
-    tagline: "Monte Carlo portfolio optimiser — 100k+ portfolios in under 0.1s, SLSQP efficient frontier, Ledoit-Wolf covariance.",
+    summary: "Monte Carlo portfolio optimiser with an exact efficient frontier.",
     category: "Quant",
     year: "2026",
-    stack: ["Python", "SciPy", "NumPy"],
+    stack: ["Python", "SciPy", "NumPy", "Plotly.js"],
     live: "https://mcs-portfolio-optimizer.vercel.app",
     repo: "https://github.com/snipy09/Monte-carlo-simulation-for-portfolio-optimization",
-    hue: 180,
+    visual: "frontier",
+    details: [
+      "Simulates 100,000+ portfolios in under 0.1s using vectorised NumPy and Dirichlet sampling.",
+      "SLSQP solves for maximum Sharpe and minimum volatility; Ledoit-Wolf shrinkage cleans the covariance matrix.",
+      "Reports VaR, CVaR, Sortino and Calmar ratios in an interactive web terminal.",
+    ],
   },
   {
+    slug: "marketguard",
     name: "MarketGuard",
-    tagline: "OHLCV validation and anomaly engine — Z-score, MAD and Isolation Forest ensemble with a FINRA-style quality score.",
-    category: "Quant · Data",
+    summary: "Validation and anomaly detection for OHLCV market data.",
+    category: "Quant",
     year: "2026",
-    stack: ["Python", "scikit-learn", "SQLite"],
+    stack: ["Python", "scikit-learn", "SQLite", "Plotly"],
     live: "https://ohlcv-market-pipeline.vercel.app",
     repo: "https://github.com/snipy09/OHLCV",
-    hue: 150,
+    visual: "candles",
+    details: [
+      "Checks structure, price logic (high ≥ open/close, low ≤ open/close) and date continuity.",
+      "Combines rolling z-scores, median absolute deviation and Isolation Forest to flag bad ticks.",
+      "Scores each dataset 0–100 and stores clean data to CSV and SQLite.",
+    ],
   },
   {
+    slug: "nomadic",
+    name: "Nomadic",
+    summary: "A career operating system for planning, tracking and applying to roles in one place.",
+    category: "Product",
+    year: "2026",
+    stack: ["TypeScript", "Next.js"],
+    live: "https://nomadicai.vercel.app",
+  },
+  {
+    slug: "dcuboid",
     name: "DCuboid CRM",
-    tagline: "A clean, fast CRM with a navigation system built for teams that live in their pipeline.",
-    category: "Full-stack",
+    summary: "A lightweight CRM with fast navigation for small sales teams.",
+    category: "Product",
     year: "2026",
     stack: ["TypeScript", "Next.js", "Postgres"],
     live: "https://crm-dcuboid.vercel.app",
-    hue: 30,
   },
   {
-    name: "Instagram AI AutoPilot",
-    tagline: "Stealth AI automation — context-aware comments and DM replies, with an anti-ban engine of jitter, quotas and sleep cycles.",
-    category: "AI · Automation",
+    slug: "kubair",
+    name: "Kubair",
+    summary: "A trading workspace that turns written strategy ideas into backtests.",
+    category: "Product",
     year: "2026",
-    stack: ["TypeScript", "Playwright", "OpenAI"],
-    repo: "https://github.com/snipy09/instagram-automation",
-    hue: 320,
+    stack: ["TypeScript", "React", "Python"],
+    live: "https://v1-kubair.vercel.app",
   },
   {
-    name: "Ads Intelligence",
-    tagline: "Meta + Google Ads in one dashboard, with Claude generating the insights.",
-    category: "AI · Dashboard",
+    slug: "ads-dashboard",
+    name: "Ads Dashboard",
+    summary: "Meta and Google Ads performance in a single reporting view.",
+    category: "Product",
     year: "2026",
-    stack: ["Next.js", "Claude", "Ads APIs"],
+    stack: ["Next.js", "TypeScript", "Ads APIs"],
     live: "https://meta-google-ads-integrated-dashboar.vercel.app",
     repo: "https://github.com/snipy09/Meta-google-ads-integrated-dashboard",
-    hue: 45,
   },
   {
-    name: "Kubair",
-    tagline: "Trading and strategy workspace that turns natural-language ideas into backtests.",
-    category: "Quant · Product",
-    year: "2026",
-    stack: ["TypeScript", "Python", "React"],
-    live: "https://v1-kubair.vercel.app",
-    hue: 100,
-  },
-  {
-    name: "PulseFlow",
-    tagline: "Static-exported B2B platform for a real-time workflow engine — Next.js 15, React 19, Framer Motion.",
-    category: "Web",
-    year: "2026",
-    stack: ["Next.js 15", "React 19", "Framer"],
-    live: "https://as1-two.vercel.app",
-    repo: "https://github.com/snipy09/As1",
-    hue: 230,
-  },
-  {
-    name: "Telegram Job Bot",
-    tagline: "Aggregates Remotive, RemoteOK, Arbeitnow and Jobicy into keyword alerts, search and bookmarks.",
+    slug: "instagram-autopilot",
+    name: "Instagram AutoPilot",
+    summary: "Background engagement bot with daily quotas, randomised timing and a local dashboard.",
     category: "Automation",
     year: "2026",
-    stack: ["Python", "Telegram", "Docker"],
-    repo: "https://github.com/snipy09/telegram-job-bot",
-    hue: 190,
+    stack: ["TypeScript", "Playwright", "Express"],
+    repo: "https://github.com/snipy09/instagram-automation",
   },
   {
+    slug: "telegram-job-bot",
+    name: "Telegram Job Bot",
+    summary: "Pulls remote listings from four job boards into keyword alerts, search and bookmarks.",
+    category: "Automation",
+    year: "2026",
+    stack: ["Python", "Telegram API", "Docker"],
+    repo: "https://github.com/snipy09/telegram-job-bot",
+  },
+  {
+    slug: "lead-extractor",
     name: "Lead Extractor Pro",
-    tagline: "Scraping toolkit that turns the open web into a clean lead list.",
+    summary: "Collects business contact details from public listings into a clean export.",
     category: "Automation",
     year: "2026",
     stack: ["JavaScript", "Scraping"],
     live: "https://magic-lead-extractor-pro.vercel.app",
-    hue: 0,
   },
   {
-    name: "Storonix",
-    tagline: "Product catalogue website for an equipment brand.",
-    category: "Client · Web",
+    slug: "pulseflow",
+    name: "PulseFlow",
+    summary: "Marketing site for a workflow automation product, fully statically exported.",
+    category: "Web",
     year: "2026",
-    stack: ["HTML", "CSS", "JS"],
+    stack: ["Next.js 15", "React 19", "Framer Motion"],
+    live: "https://as1-two.vercel.app",
+    repo: "https://github.com/snipy09/As1",
+  },
+  {
+    slug: "storonix",
+    name: "Storonix",
+    summary: "Product catalogue website for an equipment supplier.",
+    category: "Web",
+    year: "2026",
+    stack: ["HTML", "CSS", "JavaScript"],
     live: "https://storonix-equipment.vercel.app",
-    hue: 280,
   },
 ]
 
-export const STACK = [
-  { group: "Languages", items: ["Python", "TypeScript", "JavaScript", "SQL", "HTML/CSS"] },
-  { group: "AI", items: ["Claude", "OpenAI", "Gemini", "LangChain", "CrewAI", "RAG"] },
-  { group: "Web", items: ["React", "Next.js", "Node.js", "FastAPI", "Tailwind"] },
-  { group: "Quant", items: ["NumPy", "SciPy", "pandas", "scikit-learn", "Plotly"] },
-  { group: "Data & Infra", items: ["Postgres", "Supabase", "Docker", "Vercel", "Git"] },
-  { group: "Motion", items: ["GSAP", "Three.js", "Framer Motion", "WebGL"] },
+export const CATEGORIES: Category[] = ["Quant", "Product", "Automation", "Web"]
+
+export const SERVICES = [
+  {
+    title: "Quant & data",
+    body: "Research tooling, backtests, risk analytics and the data pipelines that feed them.",
+    items: ["Portfolio optimisation", "Regime & risk models", "Market data cleaning"],
+  },
+  {
+    title: "Product engineering",
+    body: "Full-stack web apps, dashboards and internal tools that teams use every day.",
+    items: ["Next.js & React", "APIs & Postgres", "Auth, billing, deploys"],
+  },
+  {
+    title: "Automation",
+    body: "Bots, scrapers and scheduled jobs that take repetitive work off people's plates.",
+    items: ["Scraping & extraction", "Telegram & social bots", "Integrations & webhooks"],
+  },
+  {
+    title: "Websites",
+    body: "Fast, accessible marketing sites and landing pages with considered motion.",
+    items: ["Design to build", "Motion & 3D", "SEO & performance"],
+  },
+]
+
+export const TOOLS: { group: string; items: string[] }[] = [
+  { group: "Languages", items: ["Python", "TypeScript", "JavaScript", "SQL"] },
+  { group: "Front end", items: ["React", "Next.js", "Tailwind", "Three.js"] },
+  { group: "Back end", items: ["Node.js", "FastAPI", "Postgres", "Supabase"] },
+  { group: "Data", items: ["NumPy", "pandas", "SciPy", "scikit-learn"] },
+  { group: "Ops", items: ["Docker", "Vercel", "GitHub Actions", "Playwright"] },
 ]
