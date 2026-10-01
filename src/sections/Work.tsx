@@ -56,7 +56,7 @@ export default function Work() {
           <span>03</span> Selected work
         </p>
         <h2 className="section-title" data-reveal>
-          Things I've shipped<span className="muted">.</span>
+          Shipped<span className="muted">.</span>
         </h2>
       </div>
 
@@ -67,9 +67,19 @@ export default function Work() {
             <li key={p.name} className="work-row" onMouseEnter={() => setActive(i)}>
               <a href={href} target="_blank" rel="noreferrer" className="work-link">
                 <span className="work-idx mono">{String(i + 1).padStart(2, "0")}</span>
-                <span className="work-name">{p.name}</span>
-                <span className="work-tagline">{p.tagline}</span>
-                <span className="work-cat mono">{p.category}</span>
+                <span className="work-main">
+                  <span className="work-name">{p.name}</span>
+                  <span className="work-tagline">{p.tagline}</span>
+                </span>
+                <span className="work-metric">
+                  <strong>{p.metric.value}</strong>
+                  <span>{p.metric.label}</span>
+                </span>
+                <span className="work-stack">
+                  {p.stack.map((t) => (
+                    <span key={t}>{t}</span>
+                  ))}
+                </span>
                 <span className="work-arrow">
                   <ArrowUpRight size={22} strokeWidth={1.5} />
                 </span>
@@ -94,6 +104,7 @@ export default function Work() {
               <span className="mono">{current.year}</span>
             </div>
             <div className="wp-name">{current.name}</div>
+            <div className="wp-tag">{current.tagline}</div>
             <div className="wp-stack">
               {current.stack.map((s) => (
                 <span key={s}>{s}</span>

@@ -2,9 +2,20 @@ import { ShaderBackground } from "@/components/ui/shader-b3e94fd7"
 import Magnetic from "@/components/Magnetic"
 import { PROFILE } from "@/lib/data"
 import { scrollTo } from "@/lib/scroll"
-import { ArrowUp } from "lucide-react"
+import { ArrowUp, Check, Copy } from "lucide-react"
+import { useState } from "react"
 
 export default function Contact() {
+  const [copied, setCopied] = useState(false)
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(PROFILE.email)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1800)
+    } catch {
+      window.location.href = `mailto:${PROFILE.email}`
+    }
+  }
   return (
     <section className="contact" id="contact">
       <ShaderBackground className="contact-shader" />
@@ -25,9 +36,15 @@ export default function Contact() {
               <span>Get in touch</span>
             </a>
           </Magnetic>
-          <a href={`mailto:${PROFILE.email}`} className="contact-email link-underline">
-            {PROFILE.email}
-          </a>
+          <div className="contact-mail">
+            <a href={`mailto:${PROFILE.email}`} className="contact-email link-underline">
+              {PROFILE.email}
+            </a>
+            <button className="copy-btn" onClick={copy} aria-label="Copy email address">
+              {copied ? <Check size={16} strokeWidth={1.75} /> : <Copy size={16} strokeWidth={1.75} />}
+              <span>{copied ? "Copied" : "Copy"}</span>
+            </button>
+          </div>
         </div>
 
         <footer className="footer">

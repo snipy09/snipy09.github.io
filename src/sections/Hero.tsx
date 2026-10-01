@@ -78,14 +78,17 @@ export default function Hero({ ready }: { ready: boolean }) {
               </span>
             </span>
           </p>
-          <p className="hero-lede fade-up">
-            Software engineer working across quant, full-stack, automation and design. I build products end to end,
-            from the data model to the interface.
-          </p>
-          <button className="scroll-cue fade-up" onClick={() => scrollTo("#about")}>
-            <span className="mono">Scroll</span>
-            <span className="scroll-line" />
-          </button>
+          <div className="hero-side fade-up">
+            <p className="hero-lede">{PROFILE.lede}</p>
+            <div className="hero-ctas">
+              <button className="btn btn-light" onClick={() => scrollTo("#work")}>
+                View work
+              </button>
+              <a className="btn btn-outline" href={`mailto:${PROFILE.email}`}>
+                Contact
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
