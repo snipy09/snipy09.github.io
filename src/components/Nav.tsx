@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react"
-import { PROFILE } from "@/lib/data"
 import { scrollTo } from "@/lib/scroll"
 
 const LINKS = [
@@ -9,20 +7,7 @@ const LINKS = [
   { href: "#contact", label: "Contact" },
 ]
 
-function useClock(tz: string) {
-  const [t, setT] = useState("")
-  useEffect(() => {
-    const fmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: tz })
-    const tick = () => setT(fmt.format(new Date()))
-    tick()
-    const id = setInterval(tick, 15000)
-    return () => clearInterval(id)
-  }, [tz])
-  return t
-}
-
 export default function Nav() {
-  const time = useClock(PROFILE.timezone)
   const go = (e: React.MouseEvent, href: string) => {
     e.preventDefault()
     scrollTo(href)
@@ -40,9 +25,6 @@ export default function Nav() {
           </a>
         ))}
       </nav>
-      <div className="nav-meta mono">
-        <span className="pulse" /> Available · {time} IST
-      </div>
     </header>
   )
 }
