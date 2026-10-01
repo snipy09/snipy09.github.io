@@ -4,7 +4,7 @@ export const PROFILE = {
   last: "Mishra",
   email: "sajalmishra0906@gmail.com",
   github: "https://github.com/snipy09",
-  linkedin: "https://linkedin.com/in/sajalmishra",
+  linkedin: "https://www.linkedin.com/in/sajalmishra03",
   location: "India",
   timezone: "Asia/Kolkata",
   roles: [
