@@ -299,124 +299,93 @@ main { position: relative; z-index: 1; }
 }
 
 /* ==========================================================================
-   Preloader: a glass keyboard whose keys are the tools I use
+   Preloader: an isometric line-drawn keyboard; every letter key is a tool I use
    ========================================================================== */
 html.is-loading, html.is-loading body { overflow: hidden; }
 
 .preloader {
   position: fixed; inset: 0; z-index: 200;
-  display: grid; place-items: center;
-  background: #06070b; overflow: hidden; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: #0b0b0c; color: rgba(255, 255, 255, 0.72);
+  overflow: hidden; cursor: pointer;
   clip-path: inset(0 0 0 0);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font);
+  font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 
-.pl-blobs { position: absolute; inset: 0; }
-.blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.8; will-change: transform; }
-.b1 { width: 52vmax; height: 52vmax; left: -12vmax; top: -18vmax; background: #2b4bf2; animation: drift1 16s ease-in-out infinite alternate; }
-.b2 { width: 44vmax; height: 44vmax; right: -14vmax; top: 4vmax; background: #7c3aed; animation: drift2 19s ease-in-out infinite alternate; }
-.b3 { width: 40vmax; height: 40vmax; left: 18vmax; bottom: -22vmax; background: #06b6d4; opacity: 0.6; animation: drift3 22s ease-in-out infinite alternate; }
-.b4 { width: 20vmax; height: 20vmax; right: 22vmax; bottom: 6vmax; background: #f97316; opacity: 0.55; animation: drift1 14s ease-in-out infinite alternate-reverse; }
-@keyframes drift1 { to { transform: translate(10vmax, 8vmax) scale(1.1); } }
-@keyframes drift2 { to { transform: translate(-12vmax, 10vmax) scale(0.9); } }
-@keyframes drift3 { to { transform: translate(8vmax, -10vmax) scale(1.15); } }
+.kb-fit { width: 860px; height: 440px; display: grid; place-items: center; flex: none; }
+.kb-float { translate: 0 0; animation: kbBob 6s ease-in-out infinite; }
+@keyframes kbBob { 50% { translate: 0 -8px; } }
 
-.kb-stage { position: relative; perspective: 1400px; width: min(94vw, 1040px); }
-.kb {
-  --kbw: min(94vw, 1040px);
-  --u: calc(var(--kbw) / 13.7);
-  --g: calc(var(--u) * 0.12);
+.kb-scene {
+  --u: 46px;
+  --pad: 16px;
+  --rx: 58;
+  --rz: 32;
   position: relative;
-  padding: calc(var(--u) * 0.32);
-  border-radius: calc(var(--u) * 0.42);
-  transform: rotateX(24deg);
-  transform-origin: 50% 60%;
+  width: calc(var(--u) * 15 + var(--pad) * 2);
+  height: calc(var(--u) * 5 + var(--pad) * 2);
+  transform-style: preserve-3d;
+  transform: rotateX(calc(var(--rx) * 1deg)) rotateZ(calc(var(--rz) * 1deg));
 }
-.kb-plate {
-  position: absolute; inset: 0; border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
-  -webkit-backdrop-filter: blur(28px) saturate(160%);
-  backdrop-filter: blur(28px) saturate(160%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 calc(var(--u) * 0.18) 0 -2px rgba(255, 255, 255, 0.05),
-    0 50px 90px -30px rgba(0, 0, 0, 0.75);
-}
-.kb-keys { position: relative; display: grid; gap: var(--g); }
-.kb-row { display: flex; gap: var(--g); }
 
-.kc {
-  position: relative; flex: 0 0 auto;
-  width: calc(var(--u) * var(--w, 1) - var(--g));
-  height: calc(var(--u) - var(--g));
+/* Box faces. Caps rise from z=0 to --d; the case sinks from z=0 to -d. */
+.case, .cap { position: absolute; transform-style: preserve-3d; }
+.face { position: absolute; box-sizing: border-box; display: block; }
+.wall { background: #0a0a0b; border: 1px solid rgba(255, 255, 255, 0.42); }
+.wall-front { left: 0; right: 0; top: 100%; height: var(--d); transform-origin: top; }
+.wall-back { left: 0; right: 0; bottom: 100%; height: var(--d); transform-origin: bottom; }
+.wall-left { top: 0; bottom: 0; right: 100%; width: var(--d); transform-origin: right; }
+.wall-right { top: 0; bottom: 0; left: 100%; width: var(--d); transform-origin: left; }
+
+.cap { --d: 13px; inset: 2px; transition: transform 0.12s ease-out; }
+.cap .wall-front { transform: rotateX(90deg); }
+.cap .wall-back { transform: rotateX(-90deg); }
+.cap .wall-left { transform: rotateY(90deg); }
+.cap .wall-right { transform: rotateY(-90deg); }
+.cap .top {
+  inset: 0; transform: translateZ(var(--d));
   display: grid; place-items: center;
-  border-radius: calc(var(--u) * 0.2);
-  color: rgba(255, 255, 255, 0.78);
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.08) 48%, rgba(255, 255, 255, 0.04) 100%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%) brightness(1.05);
-  backdrop-filter: blur(14px) saturate(140%) brightness(1.05);
-  box-shadow:
-    inset 0 1px 0.5px rgba(255, 255, 255, 0.65),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.14),
-    inset 0 0 0 0.5px rgba(255, 255, 255, 0.28),
-    0 1px 1px rgba(0, 0, 0, 0.25),
-    0 3px 0 -1px rgba(255, 255, 255, 0.06),
-    0 10px 20px -8px rgba(0, 0, 0, 0.55);
-  transition: color 0.3s, box-shadow 0.35s, background 0.35s;
-  will-change: transform;
+  border: 1px solid rgba(255, 255, 255, 0.66); border-radius: 5px;
+  /* Frosted glass on black: a soft sheen from the top-left and a bright top rim. */
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.02) 55%), #0e0e0f;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-/* Specular sheen: follows the cursor across every key at once, like one light source. */
-.kc::before {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(120% 100% at var(--lx, 30%) var(--ly, 0%), rgba(255, 255, 255, 0.32), transparent 60%);
+/* The dish line of a keycap. */
+.cap .top::after { content: ""; position: absolute; inset: 3px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px; }
+.cap svg { width: 50%; height: 50%; fill: rgba(255, 255, 255, 0.5); transition: fill 0.25s, filter 0.25s; }
+
+.key { position: absolute; transform-style: preserve-3d;
+  left: calc(var(--x) * var(--u) + var(--pad)); top: calc(var(--y) * var(--u) + var(--pad));
+  width: calc(var(--w) * var(--u)); height: var(--u); }
+.key.is-lit svg { fill: color-mix(in srgb, var(--brand) 82%, #fff); }
+.key.is-pressed .cap { transform: translateZ(-6px); }
+.key.is-pressed .top { border-color: #fff; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 0 26px rgba(255, 255, 255, 0.4); }
+.key.is-pressed .wall { border-color: #fff; }
+.key.is-pressed svg { filter: drop-shadow(0 0 6px color-mix(in srgb, var(--brand) 80%, transparent)); }
+
+.case { --d: 20px; inset: 0; }
+.case .top {
+  inset: 0; border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01) 60%), #0c0c0d;
 }
-.kc svg { position: relative; width: 44%; height: 44%; fill: currentColor; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35)); transition: filter 0.35s; }
+.case .wall-front { transform: rotateX(-90deg); }
+.case .wall-back { transform: rotateX(90deg); }
+.case .wall-left { transform: rotateY(-90deg); }
+.case .wall-right { transform: rotateY(90deg); }
 
-.kc-logo.is-lit {
-  color: color-mix(in srgb, var(--brand) 78%, #fff);
-  background:
-    radial-gradient(90% 90% at 50% 55%, color-mix(in srgb, var(--brand) 22%, transparent), transparent 70%),
-    linear-gradient(160deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.06) 100%);
-  box-shadow:
-    inset 0 1px 0.5px rgba(255, 255, 255, 0.75),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.16),
-    inset 0 0 0 0.5px rgba(255, 255, 255, 0.35),
-    0 1px 1px rgba(0, 0, 0, 0.25),
-    0 3px 0 -1px rgba(255, 255, 255, 0.06),
-    0 10px 26px -6px color-mix(in srgb, var(--brand) 55%, transparent);
+.pl-meter { width: 168px; margin-top: 28px; font-size: 13px; letter-spacing: 0.02em; }
+.pl-bar { display: block; height: 1px; background: rgba(255, 255, 255, 0.16); }
+.pl-bar > span { display: block; height: 100%; background: #fff; transform-origin: left; transition: transform 0.2s ease-out; }
+.pl-row { display: flex; justify-content: space-between; margin-top: 14px; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 900px) {
+  .kb-fit { scale: 0.7; margin: -66px 0; }
 }
-.kc-logo.is-lit svg { filter: drop-shadow(0 0 calc(var(--u) * 0.12) color-mix(in srgb, var(--brand) 75%, transparent)); }
-
-.kc-mod { place-items: end start; padding: calc(var(--u) * 0.12) calc(var(--u) * 0.15); }
-.kc-mod.is-right { place-items: end end; }
-.kc-label { position: relative; font-size: calc(var(--u) * 0.155); font-weight: 500; letter-spacing: 0.01em; color: rgba(255, 255, 255, 0.62); white-space: nowrap; }
-.kc-arrow { place-items: center; padding: 0; }
-.kc-arrow .kc-label { font-size: calc(var(--u) * 0.13); }
-.kc-arrows-v { flex: 0 0 auto; width: calc(var(--u) * var(--w, 1) - var(--g)); display: flex; flex-direction: column; gap: 2px; }
-.kc-half { width: 100%; height: calc((var(--u) - var(--g) - 2px) / 2); border-radius: calc(var(--u) * 0.14); }
-
-.kc-space { overflow: hidden; }
-.kc-fill {
-  position: absolute; inset: 0; border-radius: inherit;
-  background: linear-gradient(90deg, rgba(43, 75, 242, 0.55), rgba(124, 58, 237, 0.55));
-  transform-origin: left; transition: transform 0.18s ease-out;
-}
-.kc-space-text { position: relative; font-size: max(10px, calc(var(--u) * 0.2)); font-weight: 600; color: #fff; letter-spacing: -0.005em; font-variant-numeric: tabular-nums; }
-
-.pl-hint {
-  position: absolute; bottom: calc(24px + env(safe-area-inset-bottom)); left: 0; right: 0;
-  text-align: center; font-size: 13px; color: rgba(255, 255, 255, 0.5);
-}
-
-/* Phones: the full keyboard would be unreadable, so it becomes a 5-column glass keypad. */
 @media (max-width: 640px) {
-  .kb-stage { width: 92vw; perspective: 1000px; }
-  .kb { --u: calc((92vw - 28px) / 5); --g: calc(var(--u) * 0.15); padding: 14px; border-radius: 26px; transform: rotateX(14deg); }
-  .kb-keys { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-  .kb-row { display: contents; }
-  .kc-mod, .kc-arrows-v { display: none; }
-  .kc-logo { width: auto; height: auto; aspect-ratio: 1; border-radius: 22%; }
-  .kc-space { grid-column: 1 / -1; width: auto; height: calc(var(--u) * 0.78); border-radius: 18px; }
-  .kc-space-text { font-size: 15px; }
+  .kb-fit { scale: 0.5; margin: -110px 0; }
+}
+@media (max-width: 420px) {
+  .kb-fit { scale: 0.44; margin: -124px 0; }
 }
