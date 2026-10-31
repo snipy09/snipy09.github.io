@@ -58,6 +58,40 @@ function brand(hex: string) {
   return lum < 0.18 ? "#ffffff" : `#${hex}`
 }
 
+/** Press a logo: it sinks into the plate and springs back. */
+function strike(key: Element) {
+  const glyph = key.querySelector(".glyph")
+  if (!glyph) return
+  key.classList.add("is-lit")
+  gsap
+    .timeline()
+    .to(glyph, { z: -7, duration: 0.08, ease: "power2.out" })
+    .to(glyph, { z: 0, duration: 0.45, ease: "back.out(3)" })
+}
+
+/** A logo as a slab of glass: a few stacked copies give it thickness, the top one carries the sheen and rim. */
+function GlassLogo({ logo, id }: { logo: Logo; id: string }) {
+  return (
+    <div className="glyph">
+      {[3, 2, 1].map((n) => (
+        <svg key={n} className={`layer l${n}`} viewBox="0 0 24 24" aria-hidden="true">
+          <path d={logo.path} />
+        </svg>
+      ))}
+      <svg className="layer top" viewBox="0 0 24 24" aria-hidden="true">
+        <defs>
+          <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#fff" stopOpacity="0.85" />
+            <stop offset="0.45" stopColor="currentColor" stopOpacity="0.45" />
+            <stop offset="1" stopColor="currentColor" stopOpacity="0.14" />
+          </linearGradient>
+        </defs>
+        <path d={logo.path} fill={`url(#${id})`} />
+      </svg>
+    </div>
+  )
+}
+
 /** One extruded box: four walls and a top face, built from CSS 3D planes. */
 function Box({ className, children }: { className: string; children?: React.ReactNode }) {
   return (
@@ -83,11 +117,17 @@ export default function Preloader({ onDone }: { onDone: () => void }) {
   useEffect(() => {
     const el = scene.current
     if (!el || reduced) return
-    const rz = gsap.quickTo(el, "--rz", { duration: 1.2, ease: "power3" })
-    const rx = gsap.quickTo(el, "--rx", { duration: 1.2, ease: "power3" })
+    const tilt = { rx: 58, rz: 32 }
+    const apply = () => (el.style.transform = `rotateX(${tilt.rx}deg) rotateZ(${tilt.rz}deg)`)
     const move = (e: PointerEvent) => {
-      rz(32 + (e.clientX / innerWidth - 0.5) * 10)
-      rx(58 - (e.clientY / innerHeight - 0.5) * 8)
+      gsap.to(tilt, {
+        rz: 32 + (e.clientX / innerWidth - 0.5) * 8,
+        rx: 58 - (e.clientY / innerHeight - 0.5) * 6,
+        duration: 1.4,
+        ease: "power3.out",
+        overwrite: true,
+        onUpdate: apply,
+      })
     }
     window.addEventListener("pointermove", move)
     return () => window.removeEventListener("pointermove", move)
@@ -115,7 +155,6 @@ export default function Preloader({ onDone }: { onDone: () => void }) {
         intro?.kill()
         typing?.kill()
         logos.forEach((k) => k.classList.add("is-lit"))
-        el.querySelectorAll(".is-pressed").forEach((k) => k.classList.remove("is-pressed"))
         setCount(LOGO_TOTAL)
         gsap
           .timeline({ onComplete: finish })
@@ -144,18 +183,16 @@ export default function Preloader({ onDone }: { onDone: () => void }) {
       } catch {
         /* storage blocked: play the full version */
       }
-      const step = seen ? 0.014 : 0.046
+      const step = seen ? 0.016 : 0.055
 
-      // Keys are struck one at a time; struck keys keep their logo lit, and that count is the progress.
+      // Logos are struck one at a time; struck logos stay lit, and that count is the progress.
       const tl = (typing = gsap.timeline({ delay: seen ? 0.4 : 0.7 }))
       logos.forEach((k, i) => {
         tl.call(() => {
-          logos[i - 1]?.classList.remove("is-pressed")
-          k.classList.add("is-pressed", "is-lit")
+          strike(k)
           setCount(i + 1)
         }, undefined, i * step)
       })
-      tl.call(() => logos[logos.length - 1]?.classList.remove("is-pressed"), undefined, logos.length * step + 0.12)
 
       Promise.all([new Promise<void>((r) => tl.eventCallback("onComplete", () => r())), document.fonts?.ready]).then(() =>
         gsap.delayedCall(0.3, exit)
@@ -193,14 +230,17 @@ export default function Preloader({ onDone }: { onDone: () => void }) {
                   ["--brand" as string]: k.logo ? brand(k.logo.hex) : undefined,
                 }}
                 title={k.logo?.title}
+                onClick={
+                  k.logo
+                    ? (e) => {
+                        // Clicking a logo presses it; clicking anywhere else skips the intro.
+                        e.stopPropagation()
+                        strike(e.currentTarget)
+                      }
+                    : undefined
+                }
               >
-                <Box className="cap">
-                  {k.logo && (
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d={k.logo.path} />
-                    </svg>
-                  )}
-                </Box>
+                {k.logo ? <GlassLogo logo={k.logo} id={`glass-${i}`} /> : <Box className="cap" />}
               </div>
             ))}
           </div>
