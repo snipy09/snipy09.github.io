@@ -4,14 +4,15 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 
 gsap.registerPlugin(ScrollTrigger)
 
-/** Shared, mutable scroll state read every frame by the WebGL scene. */
+export type Shape = "quant" | "ai" | "automation"
+
+/** Shared, mutable state read every frame by the WebGL surface. */
 export const scrollState = {
-  progress: 0,
   velocity: 0,
-  /** 0..1 while the disciplines section is pinned */
-  spread: 0,
-  pointerX: 0,
-  pointerY: 0,
+  /** Which function the surface should morph towards. */
+  shape: "quant" as Shape,
+  /** 0..1 — the surface fades out once the reader is past the "What I do" section. */
+  visibility: 1,
 }
 
 export const prefersReducedMotion = () =>
@@ -20,20 +21,10 @@ export const prefersReducedMotion = () =>
 let lenis: Lenis | null = null
 
 export function initScroll() {
-  const update = () => {
-    const max = document.documentElement.scrollHeight - window.innerHeight
-    scrollState.progress = max > 0 ? window.scrollY / max : 0
-  }
+  if (prefersReducedMotion()) return () => {}
 
-  if (prefersReducedMotion()) {
-    window.addEventListener("scroll", update, { passive: true })
-    update()
-    return () => window.removeEventListener("scroll", update)
-  }
-
-  lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 1, smoothWheel: true })
+  lenis = new Lenis({ lerp: 0.1, smoothWheel: true })
   lenis.on("scroll", (l: Lenis) => {
-    scrollState.progress = l.progress || 0
     scrollState.velocity = l.velocity
     ScrollTrigger.update()
   })
@@ -48,17 +39,9 @@ export function initScroll() {
   }
 }
 
-export function scrollTo(target: string | number) {
-  if (lenis) lenis.scrollTo(target, { duration: 1.6, offset: 0 })
-  else if (typeof target === "string") document.querySelector(target)?.scrollIntoView()
-  else window.scrollTo(0, target)
-}
-
-export function stopScroll(stop: boolean) {
-  if (!lenis) {
-    document.documentElement.style.overflow = stop ? "hidden" : ""
-    return
-  }
-  if (stop) lenis.stop()
-  else lenis.start()
+export function scrollTo(target: string) {
+  const el = document.querySelector<HTMLElement>(target)
+  if (!el) return
+  if (lenis) lenis.scrollTo(el, { duration: 1.4, offset: -72 })
+  else el.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth" })
 }

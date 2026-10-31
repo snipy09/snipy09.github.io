@@ -1,96 +1,61 @@
-import { useEffect, useRef, useState } from "react"
+import { useLayoutEffect, useRef } from "react"
 import { gsap } from "gsap"
-import { PROFILE } from "@/lib/data"
-import { scrollTo } from "@/lib/scroll"
+import { PROFILE, NOMADIC } from "@/lib/data"
+import { prefersReducedMotion } from "@/lib/scroll"
+import { go } from "@/components/Nav"
 
-function Chars({ text }: { text: string }) {
-  return (
-    <span className="line" aria-label={text}>
-      {text.split("").map((c, i) => (
-        <span className="char-mask" key={i} aria-hidden>
-          <span className="char">{c}</span>
-        </span>
-      ))}
-    </span>
-  )
-}
-
-export default function Hero({ ready }: { ready: boolean }) {
+export default function Hero() {
   const root = useRef<HTMLElement>(null)
-  const [role, setRole] = useState(0)
 
-  useEffect(() => {
-    if (!ready) return
-    const id = setInterval(() => setRole((r) => (r + 1) % PROFILE.roles.length), 2200)
-    return () => clearInterval(id)
-  }, [ready])
-
-  useEffect(() => {
-    if (!ready) return
+  // The page's one orchestrated entrance: the name rises line by line while the surface draws in.
+  useLayoutEffect(() => {
+    if (prefersReducedMotion()) return
     const ctx = gsap.context(() => {
       gsap
         .timeline({ defaults: { ease: "expo.out" } })
-        .fromTo(".hero .char", { y: 0, yPercent: 110, rotate: 8 }, { yPercent: 0, rotate: 0, duration: 1.6, stagger: 0.045 })
-        .to(".hero .fade-up", { y: 0, opacity: 1, duration: 1.2, stagger: 0.08 }, "-=1.2")
-        .to(".hero-rule", { scaleX: 1, duration: 1.4 }, "-=1.2")
-
-      // Title drifts apart on scroll (parallax).
-      gsap.to(".hero-title .line:first-child", {
-        xPercent: -12,
-        ease: "none",
-        scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: true },
-      })
-      gsap.to(".hero-title .line:last-child", {
-        xPercent: 12,
-        ease: "none",
-        scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: true },
-      })
-      gsap.to(".hero-inner", {
-        opacity: 0.2,
-        ease: "none",
-        scrollTrigger: { trigger: root.current, start: "40% top", end: "bottom top", scrub: true },
-      })
+        .from(".hero-line > span", { yPercent: 110, duration: 1.4, stagger: 0.1 }, 0.15)
+        .from(".hero-after", { opacity: 0, y: 16, duration: 1.1, stagger: 0.08 }, 0.6)
     }, root)
     return () => ctx.revert()
-  }, [ready])
+  }, [])
 
   return (
-    <section ref={root} className="hero" id="top">
-      <div className="hero-inner">
-        <div className="hero-top">
-          <p className="mono fade-up">( Portfolio — 2026 )</p>
-          <p className="mono fade-up hero-loc">Based in {PROFILE.location} · Working worldwide</p>
-        </div>
-
-        <h1 className="hero-title">
-          <Chars text={PROFILE.first} />
-          <Chars text={PROFILE.last} />
+    <section id="top" className="hero" ref={root}>
+      <div className="wrap hero-inner">
+        <h1 className="hero-name" aria-label={PROFILE.name}>
+          <span className="hero-line"><span>Sajal</span></span>
+          <span className="hero-line"><span>Mishra</span></span>
         </h1>
 
-        <div className="hero-rule" />
+        <p className="hero-lede hero-after">
+          I build AI products, quant research tools and automation, and I ship them to real users.
+        </p>
+        <p className="hero-sub hero-after">
+          Engineer based in {PROFILE.location}. Right now I'm building{" "}
+          <a className="text-link" href={NOMADIC.url} target="_blank" rel="noreferrer">
+            Nomadic
+          </a>
+          , a career app for engineering students that runs on Windows, macOS and Android.
+        </p>
 
-        <div className="hero-bottom">
-          <p className="hero-role fade-up">
-            <span className="muted">Jack of all trades —</span>
-            <span className="role-slot">
-              <span className="role-word" key={role}>
-                {PROFILE.roles[role]}
-              </span>
-            </span>
-          </p>
-          <div className="hero-side fade-up">
-            <p className="hero-lede">{PROFILE.lede}</p>
-            <div className="hero-ctas">
-              <button className="btn btn-light" onClick={() => scrollTo("#work")}>
-                View work
-              </button>
-              <a className="btn btn-outline" href={`mailto:${PROFILE.email}`}>
-                Contact
-              </a>
-            </div>
-          </div>
+        <div className="hero-actions hero-after">
+          <a className="btn btn-solid" href="#work" onClick={(e) => go(e, "#work")}>
+            See selected work
+          </a>
+          <a className="btn" href={`mailto:${PROFILE.email}`}>
+            Email me
+          </a>
+          <span className="hero-socials">
+            <a className="text-link" href={PROFILE.github} target="_blank" rel="noreferrer">GitHub</a>
+            <a className="text-link" href={PROFILE.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
+          </span>
         </div>
       </div>
+
+      <p className="figure-caption hero-after">
+        <span className="figure-title">Figure 1</span>
+        An implied-volatility surface, redrawn every frame. Move your cursor across it.
+      </p>
     </section>
   )
 }

@@ -1,18 +1,14 @@
-import { Suspense, lazy, useCallback, useEffect, useState } from "react"
-import { gsap } from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { initScroll, stopScroll } from "@/lib/scroll"
-import Preloader from "@/components/Preloader"
+import { Suspense, lazy, useEffect, useState } from "react"
+import { initScroll } from "@/lib/scroll"
 import Nav from "@/components/Nav"
 import Hero from "@/sections/Hero"
-import Marquee from "@/sections/Marquee"
-import About from "@/sections/About"
-import Disciplines from "@/sections/Disciplines"
+import Areas from "@/sections/Areas"
+import Nomadic from "@/sections/Nomadic"
 import Work from "@/sections/Work"
-import Stack from "@/sections/Stack"
+import Also from "@/sections/Also"
 import Contact from "@/sections/Contact"
 
-const Scene = lazy(() => import("@/components/Scene"))
+const Surface = lazy(() => import("@/components/Surface"))
 
 function hasWebGL() {
   try {
@@ -24,84 +20,29 @@ function hasWebGL() {
 }
 
 export default function App() {
-  const [ready, setReady] = useState(false)
   const [webgl] = useState(hasWebGL)
 
-  useEffect(() => {
-    const cleanup = initScroll()
-    stopScroll(true)
-    return cleanup
-  }, [])
-
-  const onLoaded = useCallback(() => {
-    setReady(true)
-    stopScroll(false)
-  }, [])
-
-  // Generic fade-up for [data-reveal] and 3D tilt for [data-tilt].
-  useEffect(() => {
-    if (!ready) return
-    const ctx = gsap.context(() => {
-      ScrollTrigger.batch("[data-reveal]", {
-        start: "top 90%",
-        once: true,
-        onEnter: (els) =>
-          gsap.to(els, { y: 0, opacity: 1, duration: 1.2, ease: "expo.out", stagger: 0.08, overwrite: true }),
-      })
-    })
-
-    const tilts = gsap.utils.toArray<HTMLElement>("[data-tilt]")
-    const handlers = tilts.map((el) => {
-      const rx = gsap.quickTo(el, "rotateX", { duration: 0.6, ease: "power3" })
-      const ry = gsap.quickTo(el, "rotateY", { duration: 0.6, ease: "power3" })
-      const move = (e: MouseEvent) => {
-        const r = el.getBoundingClientRect()
-        ry(((e.clientX - r.left) / r.width - 0.5) * 14)
-        rx(-((e.clientY - r.top) / r.height - 0.5) * 14)
-        el.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`)
-        el.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`)
-      }
-      const leave = () => {
-        rx(0)
-        ry(0)
-      }
-      el.addEventListener("mousemove", move)
-      el.addEventListener("mouseleave", leave)
-      return () => {
-        el.removeEventListener("mousemove", move)
-        el.removeEventListener("mouseleave", leave)
-      }
-    })
-
-    // Fonts and pinned sections change layout; recalc once settled.
-    const t = setTimeout(() => ScrollTrigger.refresh(), 300)
-    return () => {
-      clearTimeout(t)
-      handlers.forEach((h) => h())
-      ctx.revert()
-    }
-  }, [ready])
+  useEffect(() => initScroll(), [])
 
   return (
     <>
-      <Preloader onDone={onLoaded} />
+      <a className="skip" href="#work">Skip to work</a>
       {webgl && (
-        <Suspense fallback={null}>
-          <div className={`scene-wrap ${ready ? "is-ready" : ""}`}>
-            <Scene />
-          </div>
-        </Suspense>
+        <div className="surface" aria-hidden="true">
+          <Suspense fallback={null}>
+            <Surface />
+          </Suspense>
+        </div>
       )}
       <Nav />
       <main>
-        <Hero ready={ready} />
-        <Marquee />
-        <About />
-        <Disciplines />
+        <Hero />
+        <Areas />
+        <Nomadic />
         <Work />
-        <Stack />
-        <Contact />
+        <Also />
       </main>
+      <Contact />
     </>
   )
 }
