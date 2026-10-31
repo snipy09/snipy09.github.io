@@ -1,23 +1,28 @@
-import { useLayoutEffect, useRef } from "react"
+import { useEffect, useLayoutEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { PROFILE, NOMADIC } from "@/lib/data"
 import { prefersReducedMotion } from "@/lib/scroll"
 import { go } from "@/components/Nav"
 
-export default function Hero() {
+export default function Hero({ ready }: { ready: boolean }) {
   const root = useRef<HTMLElement>(null)
+  const tl = useRef<gsap.core.Timeline | null>(null)
 
   // The page's one orchestrated entrance: the name rises line by line while the surface draws in.
   useLayoutEffect(() => {
     if (prefersReducedMotion()) return
     const ctx = gsap.context(() => {
-      gsap
-        .timeline({ defaults: { ease: "expo.out" } })
+      tl.current = gsap
+        .timeline({ paused: true, defaults: { ease: "expo.out" } })
         .from(".hero-line > span", { yPercent: 110, duration: 1.4, stagger: 0.1 }, 0.15)
         .from(".hero-after", { opacity: 0, y: 16, duration: 1.1, stagger: 0.08 }, 0.6)
     }, root)
     return () => ctx.revert()
   }, [])
+
+  useEffect(() => {
+    if (ready) tl.current?.play()
+  }, [ready])
 
   return (
     <section id="top" className="hero" ref={root}>

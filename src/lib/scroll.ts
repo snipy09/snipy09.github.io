@@ -13,6 +13,8 @@ export const scrollState = {
   shape: "quant" as Shape,
   /** 0..1 — the surface fades out once the reader is past the "What I do" section. */
   visibility: 1,
+  /** False until the preloader has left; the surface waits for it before drawing in. */
+  ready: false,
 }
 
 export const prefersReducedMotion = () =>
@@ -37,6 +39,11 @@ export function initScroll() {
     lenis?.destroy()
     lenis = null
   }
+}
+
+export function lockScroll(locked: boolean) {
+  if (locked) lenis?.stop()
+  else lenis?.start()
 }
 
 export function scrollTo(target: string) {

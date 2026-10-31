@@ -297,3 +297,126 @@ main { position: relative; z-index: 1; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* ==========================================================================
+   Preloader: a glass keyboard whose keys are the tools I use
+   ========================================================================== */
+html.is-loading, html.is-loading body { overflow: hidden; }
+
+.preloader {
+  position: fixed; inset: 0; z-index: 200;
+  display: grid; place-items: center;
+  background: #06070b; overflow: hidden; cursor: pointer;
+  clip-path: inset(0 0 0 0);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font);
+}
+
+.pl-blobs { position: absolute; inset: 0; }
+.blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.8; will-change: transform; }
+.b1 { width: 52vmax; height: 52vmax; left: -12vmax; top: -18vmax; background: #2b4bf2; animation: drift1 16s ease-in-out infinite alternate; }
+.b2 { width: 44vmax; height: 44vmax; right: -14vmax; top: 4vmax; background: #7c3aed; animation: drift2 19s ease-in-out infinite alternate; }
+.b3 { width: 40vmax; height: 40vmax; left: 18vmax; bottom: -22vmax; background: #06b6d4; opacity: 0.6; animation: drift3 22s ease-in-out infinite alternate; }
+.b4 { width: 20vmax; height: 20vmax; right: 22vmax; bottom: 6vmax; background: #f97316; opacity: 0.55; animation: drift1 14s ease-in-out infinite alternate-reverse; }
+@keyframes drift1 { to { transform: translate(10vmax, 8vmax) scale(1.1); } }
+@keyframes drift2 { to { transform: translate(-12vmax, 10vmax) scale(0.9); } }
+@keyframes drift3 { to { transform: translate(8vmax, -10vmax) scale(1.15); } }
+
+.kb-stage { position: relative; perspective: 1400px; width: min(94vw, 1040px); }
+.kb {
+  --kbw: min(94vw, 1040px);
+  --u: calc(var(--kbw) / 13.7);
+  --g: calc(var(--u) * 0.12);
+  position: relative;
+  padding: calc(var(--u) * 0.32);
+  border-radius: calc(var(--u) * 0.42);
+  transform: rotateX(24deg);
+  transform-origin: 50% 60%;
+}
+.kb-plate {
+  position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  backdrop-filter: blur(28px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 calc(var(--u) * 0.18) 0 -2px rgba(255, 255, 255, 0.05),
+    0 50px 90px -30px rgba(0, 0, 0, 0.75);
+}
+.kb-keys { position: relative; display: grid; gap: var(--g); }
+.kb-row { display: flex; gap: var(--g); }
+
+.kc {
+  position: relative; flex: 0 0 auto;
+  width: calc(var(--u) * var(--w, 1) - var(--g));
+  height: calc(var(--u) - var(--g));
+  display: grid; place-items: center;
+  border-radius: calc(var(--u) * 0.2);
+  color: rgba(255, 255, 255, 0.78);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.08) 48%, rgba(255, 255, 255, 0.04) 100%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%) brightness(1.05);
+  backdrop-filter: blur(14px) saturate(140%) brightness(1.05);
+  box-shadow:
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.65),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.14),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.28),
+    0 1px 1px rgba(0, 0, 0, 0.25),
+    0 3px 0 -1px rgba(255, 255, 255, 0.06),
+    0 10px 20px -8px rgba(0, 0, 0, 0.55);
+  transition: color 0.3s, box-shadow 0.35s, background 0.35s;
+  will-change: transform;
+}
+/* Specular sheen: follows the cursor across every key at once, like one light source. */
+.kc::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(120% 100% at var(--lx, 30%) var(--ly, 0%), rgba(255, 255, 255, 0.32), transparent 60%);
+}
+.kc svg { position: relative; width: 44%; height: 44%; fill: currentColor; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35)); transition: filter 0.35s; }
+
+.kc-logo.is-lit {
+  color: color-mix(in srgb, var(--brand) 78%, #fff);
+  background:
+    radial-gradient(90% 90% at 50% 55%, color-mix(in srgb, var(--brand) 22%, transparent), transparent 70%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.06) 100%);
+  box-shadow:
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.75),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.16),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.35),
+    0 1px 1px rgba(0, 0, 0, 0.25),
+    0 3px 0 -1px rgba(255, 255, 255, 0.06),
+    0 10px 26px -6px color-mix(in srgb, var(--brand) 55%, transparent);
+}
+.kc-logo.is-lit svg { filter: drop-shadow(0 0 calc(var(--u) * 0.12) color-mix(in srgb, var(--brand) 75%, transparent)); }
+
+.kc-mod { place-items: end start; padding: calc(var(--u) * 0.12) calc(var(--u) * 0.15); }
+.kc-mod.is-right { place-items: end end; }
+.kc-label { position: relative; font-size: calc(var(--u) * 0.155); font-weight: 500; letter-spacing: 0.01em; color: rgba(255, 255, 255, 0.62); white-space: nowrap; }
+.kc-arrow { place-items: center; padding: 0; }
+.kc-arrow .kc-label { font-size: calc(var(--u) * 0.13); }
+.kc-arrows-v { flex: 0 0 auto; width: calc(var(--u) * var(--w, 1) - var(--g)); display: flex; flex-direction: column; gap: 2px; }
+.kc-half { width: 100%; height: calc((var(--u) - var(--g) - 2px) / 2); border-radius: calc(var(--u) * 0.14); }
+
+.kc-space { overflow: hidden; }
+.kc-fill {
+  position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(90deg, rgba(43, 75, 242, 0.55), rgba(124, 58, 237, 0.55));
+  transform-origin: left; transition: transform 0.18s ease-out;
+}
+.kc-space-text { position: relative; font-size: max(10px, calc(var(--u) * 0.2)); font-weight: 600; color: #fff; letter-spacing: -0.005em; font-variant-numeric: tabular-nums; }
+
+.pl-hint {
+  position: absolute; bottom: calc(24px + env(safe-area-inset-bottom)); left: 0; right: 0;
+  text-align: center; font-size: 13px; color: rgba(255, 255, 255, 0.5);
+}
+
+/* Phones: the full keyboard would be unreadable, so it becomes a 5-column glass keypad. */
+@media (max-width: 640px) {
+  .kb-stage { width: 92vw; perspective: 1000px; }
+  .kb { --u: calc((92vw - 28px) / 5); --g: calc(var(--u) * 0.15); padding: 14px; border-radius: 26px; transform: rotateX(14deg); }
+  .kb-keys { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .kb-row { display: contents; }
+  .kc-mod, .kc-arrows-v { display: none; }
+  .kc-logo { width: auto; height: auto; aspect-ratio: 1; border-radius: 22%; }
+  .kc-space { grid-column: 1 / -1; width: auto; height: calc(var(--u) * 0.78); border-radius: 18px; }
+  .kc-space-text { font-size: 15px; }
+}

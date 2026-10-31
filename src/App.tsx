@@ -1,5 +1,6 @@
-import { Suspense, lazy, useEffect, useState } from "react"
-import { initScroll } from "@/lib/scroll"
+import { Suspense, lazy, useCallback, useEffect, useState } from "react"
+import { initScroll, lockScroll, scrollState } from "@/lib/scroll"
+import Preloader from "@/components/Preloader"
 import Nav from "@/components/Nav"
 import Hero from "@/sections/Hero"
 import Areas from "@/sections/Areas"
@@ -21,11 +22,23 @@ function hasWebGL() {
 
 export default function App() {
   const [webgl] = useState(hasWebGL)
+  const [ready, setReady] = useState(false)
 
-  useEffect(() => initScroll(), [])
+  useEffect(() => {
+    const cleanup = initScroll()
+    lockScroll(true)
+    return cleanup
+  }, [])
+
+  const onLoaded = useCallback(() => {
+    scrollState.ready = true
+    lockScroll(false)
+    setReady(true)
+  }, [])
 
   return (
     <>
+      <Preloader onDone={onLoaded} />
       <a className="skip" href="#work">Skip to work</a>
       {webgl && (
         <div className="surface" aria-hidden="true">
@@ -36,7 +49,7 @@ export default function App() {
       )}
       <Nav />
       <main>
-        <Hero />
+        <Hero ready={ready} />
         <Areas />
         <Nomadic />
         <Work />

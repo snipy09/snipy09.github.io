@@ -123,7 +123,7 @@ function Plane() {
     const mobile = viewport.width < 7
 
     if (!reduced) u.uTime.value += dt
-    u.uReveal.value = Math.min(1, u.uReveal.value + dt * 0.55)
+    if (scrollState.ready) u.uReveal.value = Math.min(1, u.uReveal.value + dt * 0.55)
 
     // Ease toward the active area's function.
     const target = SHAPES.indexOf(scrollState.shape)
